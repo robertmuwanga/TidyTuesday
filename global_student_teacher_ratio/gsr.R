@@ -14,10 +14,11 @@ data$Education_type <- str_split(string = data$Indicator, pattern = redundant_da
     map_chr(function(x) x[1] %>% str_trim)
 
 # Spead of education types over the years
-data %>%
-    ggplot(aes(x = Education_type)) + 
-    geom_bar() + 
-    coord_flip() + 
-    facet_wrap( ~ Time)
-
+data %>% 
+    group_by(Time, Education_type) %>% 
+    summarize('Average' = mean(Value, na.rm = T)) %>% 
+    ungroup() %>% 
+    ggplot(aes(x = Time, y = Average, col = Education_type)) + 
+    geom_point() + 
+    geom_line()
 

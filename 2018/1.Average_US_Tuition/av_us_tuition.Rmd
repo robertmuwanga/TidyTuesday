@@ -1,0 +1,64 @@
+---
+title: "Average US Tuition"
+output:
+  html_document:
+    df_print: paged
+---
+
+The Average US Tuition dataset is a dataset provided as part of the #tidytuesday challenge. The [datasets](https://github.com/rfordatascience/tidytuesday) from these challenges are relatively clean allowing individuals to focus on basic analysis and visualization.
+
+For this exercise, I decided to look at the [Average Tuition Costs in the US ](https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-04-02) challenge that was posted on 02 Apr 2018. The dataset was extracted from the [Online MBA Page](https://onlinembapage.com/average-tuition-and-educational-attainment-in-the-united-states/). 
+
+## Loading the data and doing a basic analysis
+
+We first load the relevant packages and perform a basic assessment of the data.
+
+```{r load_defaults, cache=TRUE}
+packages <- c('tidyverse', 'readr', 'readxl')
+sapply(packages, require, character.only = T)
+
+uri <- file.path('data', 'us_avg_tuition.xlsx')
+
+data <- read_xlsx(uri)
+
+data
+
+```
+Data looks relatively clean. However, it will need to be arranged into 'tidy' format to ease the analysis. We shall also add the state abbreviation code so its easier to reference.
+
+```{r tidyData}
+
+## Rearrange data into tidy format
+
+data <- rename(data, state = State) %>% # rename column to tidy data format
+    mutate(state.abb = state.abb) # Add states column. Orderis the same as in state.abb
+    
+data <- data %>% 
+    gather(key = 'year', value = 'tuition', -c(state, state.abb)) # Align dataset to tidy format
+
+data$year <- as_factor(data$year)
+data$state.abb <- as_factor(data$state.abb)
+data$state <- as_factor(data$state)
+
+```
+
+## Vizualising Data
+
+# 1. Is the average tuition cost in the US increasing?
+
+```{r Question1}
+
+theme_set(theme_bw())
+
+data %>% group_by(year) %>% 
+    summarize(US_average = mean(tuition)) %>%
+    ungroup() %>% 
+    ggplot(aes(year, US_average)) + 
+        geom_point() + 
+        geom_smooth(method = 'lm') + 
+        labs(title = 'Average US Tuition', 
+             x = 'Academic Year', 
+             y = 'Tuition Cost (US$)')
+
+```
+
