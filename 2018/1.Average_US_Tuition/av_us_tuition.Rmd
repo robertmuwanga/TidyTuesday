@@ -31,14 +31,16 @@ Data looks relatively clean. However, it will need to be arranged into 'tidy' fo
 ## Rearrange data into tidy format
 
 data <- rename(data, state = State) %>% # rename column to tidy data format
-    mutate(state.abb = state.abb) # Add states column. Orderis the same as in state.abb
+    mutate(state.abb = state.abb, 
+           state.region = state.region) # Add states column. Orderis the same as in state.abb
     
 data <- data %>% 
-    gather(key = 'year', value = 'tuition', -c(state, state.abb)) # Align dataset to tidy format
+    gather(key = 'year', value = 'tuition', -c(state, state.abb, state.region)) # Align dataset to tidy format
 
 data$year <- as_factor(data$year)
 data$state.abb <- as_factor(data$state.abb)
 data$state <- as_factor(data$state)
+data
 
 ```
 
@@ -62,3 +64,25 @@ data %>% group_by(year) %>%
 
 ```
 
+# 2. Compare the annual tuition rate per region in 2010-11
+
+```{r tuitionPerYear }
+tuition_state <- data %>% 
+  group_by(state.region, year) %>%
+  summarize(av_tuition = mean(tuition)) %>%
+  ungroup()
+
+tuition_state
+
+tuition_state %>% 
+  ggplot(aes(year, av_tuition)) + 
+  geom_point() +
+  geom_line(aes(colour = state.region, group = state.region)) + 
+  labs(x = 'Year', y = 'Tuition (US$)', title = 'Average US Tuition by State', subtitle = 'Is the average US tuition increasing?') + 
+  theme(
+    axis.text.x = element_text(
+      angle = 90
+    )
+  )
+
+```
