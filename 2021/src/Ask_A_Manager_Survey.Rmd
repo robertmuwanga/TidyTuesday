@@ -1,0 +1,51 @@
+---
+title: "Ask A Manager Survey"
+author: "Robert Muwanga"
+date: "2023-05-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(tidytuesdayR)
+library(here)
+library(urltools)
+
+```
+
+# Ask A Manager Survey
+
+This challenge focused on data from a salary survey conducted by [Ask A Survey](https://docs.google.com/spreadsheets/d/1IPS5dBSGtwYVbjsfbaMCYIWnOuRmJcbequohNxCyGVw/edit?resourcekey#gid=1625408792). The details of the survey can be accessed from [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2021/2021-05-18/readme.md).
+
+Inspiration is from David Robinson's video that can be found [here](https://www.youtube.com/watch?v=2HpRXIpU4jI).
+
+## Load data
+
+```{r load_data}
+filename <- 'tuesdata.rds'
+
+survey_path <- file.path(here(), '2021', 'data', filename)
+
+if(!file.exists(survey_path)) {
+    tuesdata <- tidytuesdayR::tt_load(2021, week = 21)
+    saveRDS(tuesdata$survey, file = survey_path)
+} else {
+    tuesdata <- readRDS(survey_path)
+}
+
+survey <- tuesdata$survey
+
+```
+
+## Data Cleanup
+
+```{r data_cleanup}
+survey %>% mutate(
+    timestamp = mdy_hms(timestamp),
+    how_old_are_you = fct_relevel(fct_reorder(how_old_are_you, parse_number(how_old_are_you)), "under 18")
+)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
