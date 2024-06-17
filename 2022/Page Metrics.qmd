@@ -1,0 +1,47 @@
+# Page Metrics
+
+We shall be analysing data from the TidyTuesday challenge involving Page Metrics. Further information on this dataset can be found [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-15).
+
+## Setting up the workspace
+```{r setup}
+# Libraries
+# library(tidytuesdayR)
+library(tidyverse)
+library(ggthemes)
+library(scales)
+library(lubridate)
+
+# Configure ggplot setup
+theme_set(theme_light())
+
+# Datasets
+image_alt <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-15/image_alt.csv')
+color_contrast <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-15/color_contrast.csv')
+ally_scores <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-15/ally_scores.csv')
+bytes_total <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-15/bytes_total.csv')
+speed_index <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-15/speed_index.csv')
+
+```
+
+## Cleaning up the data
+
+```{r data_cleaning}
+clean_data <- . %>% 
+    dplyr::select(-timestamp) %>% 
+    dplyr::mutate(date = ymd(date))
+
+image_alt <- image_alt %>% clean_data()
+color_contrast <- color_contrast %>% clean_data()
+ally_scores <- ally_scores %>% clean_data()
+bytes_total <- bytes_total %>% clean_data()
+speed_index <- speed_index %>% clean_data()
+
+```
+
+## Understanding the data visually
+
+```{r visual_data}
+speed_index %>% 
+    ggplot(aes(x = date, y = p50, colour = client)) +
+    geom_line()
+```
