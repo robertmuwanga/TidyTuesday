@@ -36,6 +36,8 @@ ally_scores <- ally_scores %>% clean_data()
 bytes_total <- bytes_total %>% clean_data()
 speed_index <- speed_index %>% clean_data()
 
+speed_index
+
 ```
 
 ## Understanding the data visually
