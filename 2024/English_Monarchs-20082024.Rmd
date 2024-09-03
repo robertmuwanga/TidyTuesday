@@ -1,0 +1,33 @@
+---
+title: "English Monarchs and Marriages"
+author: "Robert Muwanga"
+date: "2024-08-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Load packages
+packages <- c('tidyverse', 'janitor')
+lapply(packages, function(package) library(package, character.only = TRUE))
+```
+
+## Introduction
+This dataset looks at the names, ages, and marriages of various 'kings' and 'consorts', spanning 850 AD to the modern day.
+
+
+```{r cars}
+tuesdata <- tidytuesdayR::tt_load('2024-08-20')
+data <- tuesdata$english_monarchs_marriages_df
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
