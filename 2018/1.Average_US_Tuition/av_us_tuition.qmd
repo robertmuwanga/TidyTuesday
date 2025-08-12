@@ -1,0 +1,119 @@
+---
+title: "Average US Tuition" 
+date: "2025-09-12"          
+author: "Robert Muwanga"    
+---
+
+The Average US Tuition dataset is a dataset provided as part of the #tidytuesday challenge. The [datasets](https://github.com/rfordatascience/tidytuesday) from these challenges are relatively clean allowing individuals to focus on basic analysis and visualization.
+
+For this exercise, I decided to look at the [Average Tuition Costs in the US](https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-04-02) challenge that was posted on 02 Apr 2018. The dataset was extracted from the [Online MBA Page](https://onlinembapage.com/average-tuition-and-educational-attainment-in-the-united-states/).
+
+## Loading the data and doing some basic checks
+
+Let's first get an appreciation for the data.
+
+```{r}
+#| echo: false
+#| warning: false
+
+# Let's load the dataset and do some checks. 
+# I'll use the pak package to install missing packages.
+
+if(!('pak' %in% installed.packages())) install.packages('pak')
+if(!require(pak)) stop('The library "pak" cannot be installed.')
+
+# Install and load the necessary packages
+packages <- c('tidyverse', 'readxl', 'janitor', 
+              'here','scales', 'ggrepel', 'extrafont')
+pak::pkg_install(packages)
+purrr::walk(packages, \(x) require(x, character.only = TRUE))
+
+# Set up some defaults for ggplot2
+theme_set(theme_bw()) # Shall set the default theme for all our graphics
+
+# Grab the necessary dataset and load into R
+destination_path <- paste(file.path(here()), '2018', '1.Average_US_Tuition', 'data', sep = '/')
+destination_file <- 'us_avg_tuition.xlsx'
+
+download.file(
+    'https://github.com/rfordatascience/tidytuesday/raw/refs/heads/main/data/2018/2018-04-02/us_avg_tuition.xlsx', 
+    destfile = file.path(destination_path, destination_file))
+
+data <- read_excel(file.path(destination_path, destination_file))
+print(paste("Number of observations:", nrow(data)))
+print(paste("Number of variables: ", ncol(data)))
+head(data)
+```
+
+From the brief output, we can see that the dataset consists of data from 50 states and 13 date periods. The data is also in wide format that makes it difficult to analyse.
+
+Let's change the file to long format.
+
+```{r}
+data <- data |> 
+    pivot_longer(-State, names_to = 'date', values_to = 'tuition') |>
+    separate(col = date, into = c("year", NA), remove = TRUE, sep = '-') |> 
+    # Convert year to a factor based on first appearance in dataset
+    mutate(year = fct_recode(year)) |> 
+    clean_names()
+data
+```
+
+## What does the data tell us?
+
+```{r}
+median_tuition <- data |> 
+    summarise(median = median(tuition), .by = 'year')
+
+median_tuition_increase_rate = 
+    round(
+        (max(median_tuition$median) - min(median_tuition$median)) 
+          / min(median_tuition$median) * 100, 2)
+
+median_tuition_all <- round(median(data$tuition), 2)
+
+median_tuition |>
+    ggplot(aes(x = year, y = median)) + 
+    geom_point(aes(x = year, y = median)) + 
+    geom_label_repel(
+        aes(label = round(median, 2)), 
+        label.size = 0, 
+        size = 3, 
+        direction = 'y') +
+    ggtitle(
+        paste0(
+            "Median tuition increased by ", 
+            median_tuition_increase_rate, "%"), 
+        subtitle = "from 2004 - 2007"
+    ) + 
+    labs(
+        caption = "DATA::Tidytuesday, US Tuition dataset",
+        x = NULL,
+        y = "Median tuition"
+    ) + 
+    geom_hline(
+        yintercept = median_tuition_all, 
+        linetype = 2, 
+        color = 'red' 
+        ) + 
+    annotate(
+        geom = 'text',
+        label = paste0("Median Tuition: $", format(median_tuition_all, big.mark = ",")),
+        x = 11,
+        y = median_tuition_all, 
+        vjust = 1.5, 
+        size = 3, 
+        color = 'red') + 
+    scale_y_continuous(
+        labels = scales::dollar_format(), 
+        limits = c(0, 10000)) + 
+    theme(
+        panel.grid = element_blank(), 
+        panel.border = element_blank(),
+        axis.line = element_line(color = 'black', linewidth = .2),
+        plot.title = element_text(
+            face = "bold", 
+            color = 'blue'
+        )
+    )
+```

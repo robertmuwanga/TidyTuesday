@@ -7,7 +7,7 @@ output:
 
 The Average US Tuition dataset is a dataset provided as part of the #tidytuesday challenge. The [datasets](https://github.com/rfordatascience/tidytuesday) from these challenges are relatively clean allowing individuals to focus on basic analysis and visualization.
 
-For this exercise, I decided to look at the [Average Tuition Costs in the US ](https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-04-02) challenge that was posted on 02 Apr 2018. The dataset was extracted from the [Online MBA Page](https://onlinembapage.com/average-tuition-and-educational-attainment-in-the-united-states/). 
+For this exercise, I decided to look at the [Average Tuition Costs in the US](https://github.com/rfordatascience/tidytuesday/tree/master/data/2018/2018-04-02) challenge that was posted on 02 Apr 2018. The dataset was extracted from the [Online MBA Page](https://onlinembapage.com/average-tuition-and-educational-attainment-in-the-united-states/).
 
 ## Loading the data and doing a basic analysis
 
@@ -17,13 +17,14 @@ We first load the relevant packages and perform a basic assessment of the data.
 packages <- c('tidyverse', 'readr', 'readxl')
 sapply(packages, require, character.only = T)
 
-uri <- file.path('data', 'us_avg_tuition.xlsx')
+uri <- file.path(here::here(), '2018', '1.Average_US_Tuition', 'data', 'us_avg_tuition.xlsx')
 
 data <- read_xlsx(uri)
 
 data
 
 ```
+
 Data looks relatively clean. However, it will need to be arranged into 'tidy' format to ease the analysis. We shall also add the state abbreviation code so its easier to reference.
 
 ```{r tidyData}
